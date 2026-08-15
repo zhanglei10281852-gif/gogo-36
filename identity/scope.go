@@ -139,22 +139,13 @@ func patternContains(parent, child string) bool {
 	if !strings.HasPrefix(child, prefix) {
 		return false
 	}
-	if strings.HasSuffix(parent, "/**") {
+	if strings.HasSuffix(parent, "/**") && !strings.ContainsAny(strings.TrimSuffix(parent, "**"), "*?") {
 		return true
 	}
 	if !strings.ContainsAny(child, "*?") {
 		return GlobMatch(parent, child)
 	}
-	// Matching literal prefixes and equally restrictive wildcard shape is safe.
-	return literalPrefix(child) == prefix && wildcardPower(parent) >= wildcardPower(child)
-}
-
-func wildcardPower(pattern string) int {
-	power := strings.Count(pattern, "*") + strings.Count(pattern, "?")
-	if strings.Contains(pattern, "**") {
-		power += 1000
-	}
-	return power
+	return false
 }
 
 func validateScopes(scopes []string, name string) error {
